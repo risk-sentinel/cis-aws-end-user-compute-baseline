@@ -107,7 +107,7 @@ The 15 automated controls run via four custom libraries:
 - `aws_workdocs_inventory` — §4 (WorkDocs; needs `aws-sdk-workdocs` gem).
 - `aws_appstream_inventory` — §5 (AppStream 2.0; needs `aws-sdk-appstream` gem).
 
-The §3 / §4 / §5 gems are NOT bundled in upstream `cincproject/auditor`. Consumers run against the **Risk Sentinel extended cinc-auditor image** ([sparc-iac#229](https://github.com/risk-sentinel/sparc-iac/issues/229)) — when it lands. Until then, the §3 / §4 / §5 controls fall back to attestation rationale at exec time via the `connection_error` accessor (per [`docs/dev/Vendored_Resource_Gaps.md` §5](../../docs/dev/Vendored_Resource_Gaps.md#5-connection-precheck-describe-for-network-crossing-resources)). Stock cinc-auditor still produces a clean HDF — every control either runs (with extended image) or skips with documented attestation rationale (with stock image). No silent failures.
+The §3 / §4 / §5 gems are NOT bundled in upstream `cincproject/auditor`. Consumers run against the **Risk Sentinel extended cinc-auditor image** ([your CI image-bake tracker](https://example.invalid/cross-repo-issue)) — when it lands. Until then, the §3 / §4 / §5 controls fall back to attestation rationale at exec time via the `connection_error` accessor (per [`docs/dev/Vendored_Resource_Gaps.md` §5](../../docs/dev/Vendored_Resource_Gaps.md#5-connection-precheck-describe-for-network-crossing-resources)). Stock cinc-auditor still produces a clean HDF — every control either runs (with extended image) or skips with documented attestation rationale (with stock image). No silent failures.
 
 ### Per-section breakdown
 

@@ -1,0 +1,194 @@
+name: cis-aws-end-user-compute
+title: AWS End User Compute Services CIS Baseline
+maintainer: Risk Sentinel
+copyright: Risk Sentinel
+copyright_email: support@risk-sentinel.org
+license: Apache-2.0
+summary: |
+  Validates AWS end-user-compute services against CIS AWS End User Compute Services Benchmark v1.2.0.
+  Targets AWS Commercial (aws) and AWS GovCloud non-DoD (aws-us-gov).
+
+  Covers Amazon WorkSpaces (§2 desktop VDI), WorkSpaces Web (§3 browser
+  portal), Amazon WorkDocs (§4), and AWS AppStream 2.0 (§5). All four
+  sections are automated via custom libraries:
+  `aws_workspaces_inventory` (§2), `aws_workspaces_web_inventory` (§3),
+  `aws_workdocs_inventory` (§4), and `aws_appstream_inventory` (§5).
+  §3/§4/§5 require the `aws-sdk-workspacesweb` / `aws-sdk-workdocs` /
+  `aws-sdk-appstream` gems which are not in the upstream cinc-auditor
+  image — use the Risk Sentinel extended image (your CI image-bake tracker) or the
+  controls fall back to attestation rationale at exec time.
+
+  Per-control partition applicability is documented in
+  partition_applicability.yml and encoded as `tag applicable_partitions:`.
+version: 0.1.0
+inspec_version: '>= 5.0'
+
+inputs:
+  - name: aws_partition
+    type: string
+    value: aws
+    description: >-
+      AWS partition the scan is running against.
+      One of: aws (Commercial), aws-us-gov (GovCloud non-DoD).
+
+  - name: applicable_services
+    type: array
+    value: []
+    description: >-
+      Optional allowlist of end-user-compute services this scan covers.
+      Empty (default) runs all sections. Non-empty runs only controls
+      whose CIS section targets a service in the list.
+
+      Section-to-service mapping:
+      - 'workspaces'     — Section 2 (Amazon WorkSpaces — desktop VDI).
+      - 'workspaces_web' — Section 3 (WorkSpaces Web — browser portal).
+      - 'workdocs'       — Section 4 (Amazon WorkDocs).
+      - 'appstream'      — Section 5 (AWS AppStream 2.0).
+
+      Consumers running only WorkSpaces set `applicable_services:
+      [workspaces]`; consumers with a mixed AppStream + WorkDocs
+      footprint use `[appstream, workdocs]`. Default stays empty so no
+      consumer is surprised by missing coverage.
+
+      All four sections ship with custom libraries:
+      `aws_workspaces_inventory` (§2 — built into stock cinc-auditor),
+      `aws_workspaces_web_inventory` (§3 — needs aws-sdk-workspacesweb),
+      `aws_workdocs_inventory` (§4 — needs aws-sdk-workdocs), and
+      `aws_appstream_inventory` (§5 — needs aws-sdk-appstream). The
+      §3/§4/§5 gems are NOT bundled in upstream cinc-auditor; consumers
+      use the Risk Sentinel extended image (your CI image-bake tracker) or the
+      affected controls fall back to attestation rationale at exec
+      time via the connection_error pattern (per
+      docs/dev/Vendored_Resource_Gaps.md §5).
+
+  - name: scan_regions
+    type: array
+    value: []
+    description: >-
+      Explicit region allowlist for region-scoped checks. Empty (default)
+      = dynamic discovery via compute_client.describe_regions — auto-
+      narrows to the target partition. Pin to a specific list to scope
+      the scan / accelerate dev runs / match an audit-defined region set.
+
+  - name: approved_workspaces_bundles
+    type: array
+    value: []
+    description: >-
+      Allowlist of WorkSpaces bundle IDs approved for use in this
+      account (CIS §2.12). Empty (default) skips the bundle-allowlist
+      check (control becomes alternative with reference rationale).
+      Non-empty fails any WorkSpace whose `bundle_id` is not in the list.
+
+  - name: euc_iam_attestation_reference
+    type: string
+    value: ''
+    description: >-
+      Free-form reference to the consumer's documented IAM-administration
+      review for end-user-compute services (WorkSpaces / WorkDocs).
+      Surfaces in §2.1 / §4.1 attestation skip rationales. Empty cites a
+      generic rationale; populate to embed the specific review reference.
+
+  - name: euc_mfa_attestation_reference
+    type: string
+    value: ''
+    description: >-
+      Reference to the consumer's MFA enforcement review (§2.2 / §4.2 —
+      WorkSpaces / WorkDocs MFA). Same shape as
+      euc_iam_attestation_reference.
+
+  - name: euc_image_pipeline_attestation_reference
+    type: string
+    value: ''
+    description: >-
+      Reference to the consumer's image-bake-pipeline review (§2.10 /
+      §2.11 / §5.7 — WorkSpaces and AppStream OS patches + CIS OS
+      benchmark application). These checks are image-bake-time scope
+      and not exposed by the AWS API; the reference points at the
+      pipeline / golden-AMI scan evidence.
+
+  - name: euc_site_config_attestation_reference
+    type: string
+    value: ''
+    description: >-
+      Reference to the consumer's WorkDocs site-configuration review
+      (§4.4 / §4.5 / §4.6 — site-wide activity feed, allowed domains,
+      external invite restrictions). Site-level config not exposed via
+      the AWS API; consumer attests from their WorkDocs admin-console
+      review evidence.
+
+  - name: workdocs_inactive_threshold_days
+    type: numeric
+    value: 30
+    description: >-
+      Maximum days since a WorkDocs user's last access for the user to
+      be considered active (CIS §4.8). Default 30 per the CIS check.
+      Tighten / loosen per consumer policy (e.g., highly-regulated
+      consumers may use 14; lower-tempo orgs may use 60). Setting to
+      0 disables the threshold (the control still passes if every user
+      has any access timestamp at all).
+
+  - name: logging_strategy
+    type: string
+    value: custom
+    description: >-
+      How logging-related CIS controls are satisfied for this
+      consumer's compliance boundary. One of:
+
+      - 'aws_default' — AWS-managed / centralised / cross-account
+        logging is the satisfaction mechanism. Logging controls in
+        scope skip with an inheritance rationale citing the consumer's
+        documented logging-architecture attestation. Pair with
+        `logging_attestation_reference` to identify where that
+        architecture is documented.
+      - 'custom' — this account / workload operates its own logging
+        stack. Controls assert against `logging_requirements` (below).
+
+      Default 'custom' forces explicit declaration; flip to
+      'aws_default' with a populated `logging_attestation_reference`
+      when consolidated logging (e.g., a security-tooling account
+      consolidating CloudTrail, a centralised SIEM ingesting events,
+      or an Organizations-level audit trail) satisfies the boundary
+      requirement that this account's per-control checks would
+      otherwise assert per-account.
+
+  - name: logging_attestation_reference
+    type: string
+    value: ''
+    description: >-
+      Consulted only when `logging_strategy == 'aws_default'`. Free-
+      form reference to the consumer's documented logging-boundary
+      architecture (e.g., a doc path like
+      'security-architecture/logging-baseline.md §3', a URL, or a
+      ticket reference). Surfaces verbatim in the inheritance skip
+      message on every affected control so auditors can trace the
+      attestation back to the source.
+
+  - name: logging_requirements
+    type: hash
+    value: {}
+    description: >-
+      Consulted only when `logging_strategy == 'custom'`. Consumer-
+      specific logging requirements that controls assert against.
+      Recognised keys (extend per profile — see README "Logging
+      strategy" for the keys this profile reads):
+
+      - retention_days: numeric — minimum CloudWatch / S3-access-log
+        retention period.
+      - log_group_arn_prefix: string — assert that log destinations
+        start with this prefix.
+      - required_metric_filters: array of CIS rule IDs (e.g., ["5.1",
+        "5.7", "5.16"]) — the consumer commits to operating these
+        filters in this account; rules not in the list skip with the
+        boundary-inheritance rationale.
+      - metric_filter_overrides: hash keyed by CIS rule ID — per-rule
+        structured assertions beyond presence (e.g., {"5.7":
+        {"threshold": 3}}).
+
+supports:
+  - platform: aws
+
+depends:
+  - name: inspec-aws
+    git: https://github.com/inspec/inspec-aws.git
+    branch: main
+    # TODO: pin to a tag after first green CI run.

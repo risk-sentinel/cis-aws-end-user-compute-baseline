@@ -1,0 +1,21 @@
+# Consumer inputs for cis-aws-end-user-compute.
+#
+# Override values per-environment via:
+#   cinc-auditor exec profiles/cis-aws-end-user-compute \
+#     --input-file profiles/cis-aws-end-user-compute/inputs.yml
+# or individually via --input name=value
+#
+# See inspec.yml for the full input catalogue and README.md for the
+# Portability section.
+
+# ----- AWS partition -----
+aws_partition: aws
+
+# ----- End-user-compute service scope -----
+# Empty / unset (default) = all sections applicable. Uncomment to
+# scope to specific services and skip the rest.
+# applicable_services:
+#   - workspaces      # Section 2 (Amazon WorkSpaces — desktop VDI)
+#   - workspaces_web  # Section 3 (WorkSpaces Web — browser portal)
+#   - workdocs        # Section 4 (Amazon WorkDocs)
+#   - appstream       # Section 5 (AWS AppStream 2.0)

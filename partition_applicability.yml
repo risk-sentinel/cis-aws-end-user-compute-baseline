@@ -1,0 +1,210 @@
+# Per-control partition applicability — auditor-facing flat table.
+# Values per partition: applicable | not_applicable | partial
+# `reason` is required when not_applicable or partial.
+# Keep this file in sync with `tag applicable_partitions:` on each control.
+
+controls:
+  - id: 5.1
+    title: "Ensure AppStream is utilizing its own virtual private cloud (VPC)"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 5.2
+    title: "Ensure a VPC Endpoint is set for AppStream"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 5.3
+    title: "Ensure maximum session duration is no longer than 10 hours"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 5.4
+    title: "Ensure session disconnect timeout is set to 5 minutes or less"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 5.5
+    title: "Ensure session Idle disconnect timeout is set to 10 minutes or less"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 5.6
+    title: "Ensure internet access is granted and managed through your VPC"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 5.7
+    title: "Ensure Operating system updates are applied to your base image every 30 days."
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 4.1
+    title: "Ensure Administrators of WorkDocs is defined using IAM"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 4.2
+    title: "Ensure MFA is enabled for WorkDoc users"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 4.3
+    title: "Ensure Workdocs access is limited to a range of allowable IP addresses"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 4.4
+    title: "Utilize site wide activity feed for monitoring."
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 4.5
+    title: "Ensure new users can only be invited from allowed domains."
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 4.6
+    title: "Ensure only specific users are allowed to invite external users"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 4.7
+    title: "Ensure publicly shareable links is not allowed in WorkDocs"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 4.8
+    title: "Ensure any user that has not accessed WorkDocs in 30 days is set to inactive."
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 2.1
+    title: "Ensure Administration of WorkSpaces is defined using IAM"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 2.2
+    title: "Ensure MFA is enabled for WorkSpaces users"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 2.3
+    title: "Ensure WorkSpace volumes are encrypted."
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 2.4
+    title: "Ensure WorkSpaces are deployed in their own virtual private cloud (VPC)"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 2.5
+    title: "Ensure WorkSpaces traffic is controlled and routed through a NAT Gateway."
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 2.6
+    title: "Ensure Web Access to Workspaces is Disabled"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 2.7
+    title: "Ensure access is limited to trusted devices"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 2.8
+    title: "Ensure the default IP access control group is disassociated."
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 2.9
+    title: "Ensure CloudWatch is set up for WorkSpaces"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 2.10
+    title: "Ensure that patches and updates are performed on the operating system for Workstations"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 2.11
+    title: "Ensure your WorkSpaces image has the appropriate CIS Operating System Benchmark applied"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 2.12
+    title: "Restrict WorkSpaces Bundle options to organization approved versions"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 2.13
+    title: "Ensure Workspaces images are not older than 90 days."
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 2.14
+    title: "Ensure WorkSpaces that are not being utilized are removed."
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 2.15
+    title: "Ensure primary interface ports for Workspaces are not open to all inbound traffic."
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 2.16
+    title: "Ensure FIPS Endpoint encryption is enabled for WorkSpaces."
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 2.17
+    title: "Ensure WorkSpaces API requests flow through a VPC Endpoint"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 2.18
+    title: "Ensure Radius server is using the recommended security protocol"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.1
+    title: "Ensure User Access Logging is enabled"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
