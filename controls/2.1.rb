@@ -1,0 +1,110 @@
+# encoding: UTF-8
+
+control 'C-2.1' do
+  title 'Ensure Administration of WorkSpaces is defined using IAM'
+  desc  "
+    To allow users to administer Amazon WorkSpaces, IAM policies must be created and attached with the required permissions to an IAM Principal used for administration of Amazon WorkSpaces.  An IAM Principal may be a IAM Role or an IAM User, or an IAM User Group with Users within the User Group.
+
+    AWS has an AWS Managed Policy, `AmazonWorkSpacesAdmin` that grants permissions to administer Amazon WorkSpaces.  A custom managed policy or inline policy may be used to grant WorkSpaces permissions to the IAM Principal
+
+    Creating and managing Workspaces specific users is not done in AWS IAM.  Creating and managing Workspaces specific users is done within the Workspace service console.  In order to properly administer Workspaces specific users, an IAM Principal with proper permissions must be created.
+  "
+  desc  'rationale', "
+    To allow users to administer Amazon WorkSpaces, IAM policies must be created and attached with the required permissions to an IAM Principal used for administration of Amazon WorkSpaces.  An IAM Principal may be a IAM Role or an IAM User, or an IAM User Group with Users within the User Group.
+
+    AWS has an AWS Managed Policy, `AmazonWorkSpacesAdmin` that grants permissions to administer Amazon WorkSpaces.  A custom managed policy or inline policy may be used to grant WorkSpaces permissions to the IAM Principal
+
+    Creating and managing Workspaces specific users is not done in AWS IAM.  Creating and managing Workspaces specific users is done within the Workspace service console.  In order to properly administer Workspaces specific users, an IAM Principal with proper permissions must be created.
+  "
+  desc  'check', "
+    Perform the following to determine what policies are created and how the policies are used:
+
+    From the Console:
+
+    1. Login in and open the IAM console at `https://console.aws.amazon.com/iam/`.
+
+    2. In the left pane click on `User Groups`, `Users`, or `Roles`.  
+
+    3. Click on the IAM Principal (User, Group, or Role) that is to be used to administer Workspaces.
+ 
+    4. Click on `Permissions` and confirm that the AmazonWorkSpacesAdmin policy or the proper permissions are attached.
+
+    From the Command Line:
+
+    1. Run the appropriate command to determine permissions for the IAM Principal.  
+     such as `list-attached-role-policies` for attached managed policies or `get-role-policy` for inline policies.  
+    ```
+    aws iam list-attached-role-policies --role-name ```
+
+    If the AWS managed policy or a custom WorkSpaces Admin policy is not attached to the IAM Principal for administration of Workspaces, refer to the remediation below.
+  "
+  desc  'fix', "
+    If the IAM Principal for WorkSpaces Administration exists but does not have the policy attached.  
+
+    From the Console:
+
+    1. Login to the IAM console at `https://console.aws.amazon.com/iam/`.
+
+    2. In the left pane click on either `User Groups`, `Users`, or `Roles`
+
+    3. Click the proper IAM Principal.
+
+    4. Click on the `Permissions` tab
+
+    5. Click on `Attach Policy`.
+
+    6. Select the `AmazonWorkSpacesAdmin` Policy or attach the desired Managed Policy.
+
+    7. Click `Attach Policy`
+
+    From the Console
+
+    1. Login to the IAM console at `https://console.aws.amazon.com/iam/`.
+
+    2. In the left pane click on `Groups`
+
+    3. Select the `Group`.
+
+    4. Click on the `Permissions` tab
+
+    5. Click on `Attach Policy`.
+
+    6. Select the `AmazonWorkSpacesAdmin` Policy
+
+    7. Click `Attach Policy`
+	
+    From the Command Line:
+
+    1. Attach the AmazonWorkSpacesAdmin policy by running the `aws iam attach-role-policy` command
+    ```
+    aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AmazonWorkSpacesAdmin --role-name ```
+  "
+  tag severity:              'medium'
+  tag nist:                  ['AC-3', 'AC-8 a']
+  tag cci:                   ['CCI-000213', 'CCI-000051']
+  tag cis_number:            '2.1'
+  tag cis_rid:               '2.1'
+  tag cis_benchmark:         'CIS AWS End User Compute Services Benchmark v1.2.0'
+  tag cis_rule_id:           'SV-0201r1_rule'
+  tag cis_version:           '1.2.0'
+  tag cis_level:             1
+  tag cis_scored:            true
+  tag applicable_partitions: ['aws', 'aws-us-gov']
+  tag implementation_status: 'alternative'
+  tag exec_validated:        false
+
+  applicable_partition = ['aws', 'aws-us-gov'].include?(input('aws_partition'))
+  applicable_service   = Array(input('applicable_services')).empty? || Array(input('applicable_services')).include?('workspaces')
+  applicable           = applicable_partition && applicable_service
+
+  impact 0.5
+  impact 0.0 unless applicable
+
+  only_if("WORKSPACES out of scope (partition=#{input('aws_partition')}, applicable_services=#{input('applicable_services')})") do
+    applicable
+  end
+
+  describe 'Requires manual review and attestation' do
+    skip "Requires manual review and attestation provided for this control (IAM-based administration of WorkSpaces is a property of the consumer's identity posture — which IAM roles / users carry workspaces:* permissions, whether MFA is enforced on those identities, and how human admin access is gated. The WorkSpaces API does not surface admin-identity data per-workspace, so operator attests from their IAM policy inventory.)"
+  end
+end
