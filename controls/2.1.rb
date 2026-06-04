@@ -90,8 +90,7 @@ control 'C-2.1' do
   tag cis_level:             1
   tag cis_scored:            true
   tag applicable_partitions: ['aws', 'aws-us-gov']
-  tag implementation_status: 'alternative'
-  tag attestation_category:  'policy'
+  tag implementation_status: 'implemented'
   tag exec_validated:        false
 
   applicable_partition = ['aws', 'aws-us-gov'].include?(input('aws_partition'))
@@ -105,18 +104,20 @@ control 'C-2.1' do
     applicable
   end
 
-  uri          = input('c_2_1_attestation_uri', value: attestation_uri(:boundary, 'C-2.1'))
-  max_age_days = input('attestation_max_age_days', value: 365)
+  # VERIFY-don't-trust + each_profile_stands_alone (Phase C correction): built
+  # in-profile, not deferred to another profile. VERIFY is the default; attestation
+  # is an explicit opt-out (set c_2_1_attestation_uri) for scanners lacking the IAM/EC2 reads.
+  uri = input('c_2_1_attestation_uri', value: '')
   if uri.to_s.empty?
-    describe 'Requires manual review and attestation' do
-      skip "Requires manual review and attestation provided for this control (IAM-based administration of WorkSpaces is a property of the consumer's identity posture — which IAM roles / users carry workspaces:* permissions, whether MFA is enforced on those identities, and how human admin access is gated. The WorkSpaces API does not surface admin-identity data per-workspace, so operator attests from their IAM policy inventory.) [Lift to Pass-with-evidence: set boundary_docs_base / c_2_1_attestation_uri, or `saf attest apply`.]"
+    describe aws_workspaces_admin_iam do
+      its('policies_with_broad_workspaces_admin') { should be_empty }
     end
   else
-    doc = document_attestation(uri, max_age_days: max_age_days)
-    describe "C-2.1 governance attestation (#{uri})" do
+    doc = document_attestation(uri, max_age_days: input('attestation_max_age_days', value: 365))
+    describe "C-2.1 WorkSpaces admin-IAM attestation (#{uri})" do
       it('is reachable') { expect(doc.connection_error).to be_nil, "attestation unreachable: #{doc.connection_error}" }
       it('exists') { expect(doc.exists?).to eq(true) }
-      it("current within #{max_age_days}d") { expect(doc.current?).to eq(true) }
+      it('is current') { expect(doc.current?).to eq(true) }
     end
   end
 end
