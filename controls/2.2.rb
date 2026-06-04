@@ -142,18 +142,32 @@ control 'C-2.2' do
     applicable
   end
 
-  uri          = input('c_2_2_attestation_uri', value: attestation_uri(:boundary, 'C-2.2'))
-  max_age_days = input('attestation_max_age_days', value: 365)
-  if uri.to_s.empty?
-    describe 'Requires manual review and attestation' do
-      skip "Requires manual review and attestation provided for this control (WorkSpaces user MFA is enforced via the underlying directory — Simple AD, AD Connector, or AWS Managed Microsoft AD — not per-workspace. The WorkSpaces API exposes the directory ID but not the directory's MFA configuration; operator attests from the directory's authentication-settings record. For RADIUS-based MFA the radius_settings field is operator-visible via AWS Directory Service but not exposed through aws_workspaces_inventory.) [Lift to Pass-with-evidence: set boundary_docs_base / c_2_2_attestation_uri, or `saf attest apply`.]"
+  # VERIFY-don't-trust (Phase C): radius_settings IS exposed by aws_workspaces_inventory
+  # (the prior "not exposed" rationale was wrong). When the consumer's MFA model is RADIUS
+  # (workspaces_require_radius_mfa: true), assert every directory has a RADIUS server wired
+  # rather than trusting an attestation. AD-native MFA (Managed Microsoft AD) is genuinely
+  # not WorkSpaces-API-visible -> attestation floor (justified in the coverage matrix).
+  inv = aws_workspaces_inventory
+  if input('workspaces_require_radius_mfa', value: false) && inv.connection_error.nil?
+    describe 'WorkSpaces directories without RADIUS-MFA wired (CIS 2.2)' do
+      subject { inv.directories_without_mfa }
+      it { should be_empty }
     end
   else
-    doc = document_attestation(uri, max_age_days: max_age_days)
-    describe "C-2.2 governance attestation (#{uri})" do
-      it('is reachable') { expect(doc.connection_error).to be_nil, "attestation unreachable: #{doc.connection_error}" }
-      it('exists') { expect(doc.exists?).to eq(true) }
-      it("current within #{max_age_days}d") { expect(doc.current?).to eq(true) }
+    uri = input('c_2_2_attestation_uri', value: '')
+    uri = attestation_uri(:boundary, 'C-2.2') if uri.to_s.empty?
+    max_age_days = input('attestation_max_age_days', value: 365)
+    if uri.to_s.empty?
+      describe 'Requires manual review and attestation' do
+        skip "WorkSpaces user MFA via the underlying directory (Simple AD / AD Connector / Managed Microsoft AD). Set workspaces_require_radius_mfa: true to VERIFY radius_settings directly; AD-native MFA is not WorkSpaces-API-visible -> set boundary_docs_base / c_2_2_attestation_uri, or `saf attest apply`."
+      end
+    else
+      doc = document_attestation(uri, max_age_days: max_age_days)
+      describe "C-2.2 governance attestation (#{uri})" do
+        it('is reachable') { expect(doc.connection_error).to be_nil, "attestation unreachable: #{doc.connection_error}" }
+        it('exists') { expect(doc.exists?).to eq(true) }
+        it("current within #{max_age_days}d") { expect(doc.current?).to eq(true) }
+      end
     end
   end
 end
