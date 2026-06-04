@@ -277,6 +277,14 @@ inputs:
       Override URI of the C-4.6 governance attestation. Empty -> resolves via
       boundary_docs_base; SKIPs if unset.
 
+  - name: workspaces_require_radius_mfa
+    type: boolean
+    value: false
+    description: >-
+      When true, C-2.2 VERIFIES every WorkSpaces directory has a RADIUS-MFA
+      server wired (radius_settings) instead of attesting. AD-native MFA stays
+      attestation.
+
 supports:
   - platform: aws
 

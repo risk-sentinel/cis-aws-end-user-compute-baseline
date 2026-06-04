@@ -232,6 +232,17 @@ class AwsWorkspacesInventory < AwsResourceBase
     end
   end
 
+  # CIS 2.2 — directory should enforce MFA. A directory with a configured RADIUS
+  # server set (radius_settings.radius_servers non-empty) has RADIUS-MFA wired;
+  # absence is the offender signal. (AD-native MFA isn't WorkSpaces-API-visible;
+  # the matrix documents that residual.)
+  def directories_without_mfa
+    Array(@directories).each_with_object([]) do |d, acc|
+      radius = d[:radius_settings]
+      acc << d[:directory_id] if radius.nil? || radius == {} || Array(radius[:radius_servers]).empty?
+    end
+  end
+
   # CIS 2.14 — WorkSpaces in non-AVAILABLE / non-STOPPED state for
   # extended periods may be unused / orphaned.
   def workspaces_in_unhealthy_state
