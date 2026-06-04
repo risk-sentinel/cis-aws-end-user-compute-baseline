@@ -54,6 +54,7 @@ control 'C-4.4' do
   tag cis_scored:            true
   tag applicable_partitions: ['aws', 'aws-us-gov']
   tag implementation_status: 'alternative'
+  tag attestation_category:  'policy'
   tag exec_validated:        false
 
   applicable_partition = ['aws', 'aws-us-gov'].include?(input('aws_partition'))
@@ -67,7 +68,18 @@ control 'C-4.4' do
     applicable
   end
 
-  describe 'Requires manual review and attestation' do
-    skip "Requires manual review and attestation provided for this control (WorkDocs activity-feed is a site-level admin console setting. The WorkDocs SDK does not expose a queryable activity-feed-enabled flag; operator attests via the WorkDocs admin console. AWS announced WorkDocs deprecation 2025-04-25; new consumers should not adopt the service.)"
+  uri          = input('c_4_4_attestation_uri', value: attestation_uri(:boundary, 'C-4.4'))
+  max_age_days = input('attestation_max_age_days', value: 365)
+  if uri.to_s.empty?
+    describe 'Requires manual review and attestation' do
+      skip "Requires manual review and attestation provided for this control (WorkDocs activity-feed is a site-level admin console setting. The WorkDocs SDK does not expose a queryable activity-feed-enabled flag; operator attests via the WorkDocs admin console. AWS announced WorkDocs deprecation 2025-04-25; new consumers should not adopt the service.) [Lift to Pass-with-evidence: set boundary_docs_base / c_4_4_attestation_uri, or `saf attest apply`.]"
+    end
+  else
+    doc = document_attestation(uri, max_age_days: max_age_days)
+    describe "C-4.4 governance attestation (#{uri})" do
+      it('is reachable') { expect(doc.connection_error).to be_nil, "attestation unreachable: #{doc.connection_error}" }
+      it('exists') { expect(doc.exists?).to eq(true) }
+      it("current within #{max_age_days}d") { expect(doc.current?).to eq(true) }
+    end
   end
 end

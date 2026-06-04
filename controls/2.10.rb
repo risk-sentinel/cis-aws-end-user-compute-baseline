@@ -88,7 +88,7 @@ control 'C-2.10' do
   tag cis_level:             1
   tag cis_scored:            true
   tag applicable_partitions: ['aws', 'aws-us-gov']
-  tag implementation_status: 'alternative'
+  tag implementation_status: 'implemented'
   tag exec_validated:        false
 
   applicable_partition = ['aws', 'aws-us-gov'].include?(input('aws_partition'))
@@ -102,7 +102,18 @@ control 'C-2.10' do
     applicable
   end
 
-  describe 'Requires manual review and attestation' do
-    skip "Requires manual review and attestation provided for this control (OS patch and update compliance for WorkSpaces is enforced either by enabling EnableMaintenanceMode on the WorkSpaces directory (AWS-managed maintenance window) or by managing patching via SSM Patch Manager. CIS 2.10 measures the former — see follow-up to auto-detect via aws_workspaces_inventory.directories[*].workspace_creation_properties.enable_maintenance_mode. Operator attests via the directory's maintenance-mode setting in the WorkSpaces console in the meantime.)"
+  inv = aws_workspaces_inventory
+  if inv.connection_error
+    describe 'WorkSpaces directory maintenance-mode (2.10)' do
+      skip "WorkSpaces inventory unreachable (#{inv.connection_error}) — attest the directory maintenance-mode setting separately."
+    end
+  else
+    offenders = Array(inv.directories).reject do |d|
+      d.dig(:workspace_creation_properties, :enable_maintenance_mode) == true
+    end.map { |d| d[:directory_id] }
+    describe 'WorkSpaces directories without EnableMaintenanceMode (CIS 2.10)' do
+      subject { offenders }
+      it { should be_empty }
+    end
   end
 end

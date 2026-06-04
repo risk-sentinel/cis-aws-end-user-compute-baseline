@@ -46,6 +46,7 @@ control 'C-2.11' do
   tag cis_scored:            true
   tag applicable_partitions: ['aws', 'aws-us-gov']
   tag implementation_status: 'alternative'
+  tag attestation_category:  'policy'
   tag exec_validated:        false
 
   applicable_partition = ['aws', 'aws-us-gov'].include?(input('aws_partition'))
@@ -59,7 +60,18 @@ control 'C-2.11' do
     applicable
   end
 
-  describe 'Requires manual review and attestation' do
-    skip "Requires manual review and attestation provided for this control (whether the WorkSpaces base image has the appropriate CIS OS Benchmark applied is image-build-pipeline scope — operators attest from their image-bake artefacts (golden-AMI scan results, not runtime).)"
+  uri          = input('c_2_11_attestation_uri', value: attestation_uri(:boundary, 'C-2.11'))
+  max_age_days = input('attestation_max_age_days', value: 365)
+  if uri.to_s.empty?
+    describe 'Requires manual review and attestation' do
+      skip "Requires manual review and attestation provided for this control (whether the WorkSpaces base image has the appropriate CIS OS Benchmark applied is image-build-pipeline scope — operators attest from their image-bake artefacts (golden-AMI scan results, not runtime).) [Lift to Pass-with-evidence: set boundary_docs_base / c_2_11_attestation_uri, or `saf attest apply`.]"
+    end
+  else
+    doc = document_attestation(uri, max_age_days: max_age_days)
+    describe "C-2.11 governance attestation (#{uri})" do
+      it('is reachable') { expect(doc.connection_error).to be_nil, "attestation unreachable: #{doc.connection_error}" }
+      it('exists') { expect(doc.exists?).to eq(true) }
+      it("current within #{max_age_days}d") { expect(doc.current?).to eq(true) }
+    end
   end
 end

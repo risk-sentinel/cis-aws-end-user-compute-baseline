@@ -60,6 +60,7 @@ control 'C-4.5' do
   tag cis_scored:            true
   tag applicable_partitions: ['aws', 'aws-us-gov']
   tag implementation_status: 'alternative'
+  tag attestation_category:  'policy'
   tag exec_validated:        false
 
   applicable_partition = ['aws', 'aws-us-gov'].include?(input('aws_partition'))
@@ -73,7 +74,18 @@ control 'C-4.5' do
     applicable
   end
 
-  describe 'Requires manual review and attestation' do
-    skip "Requires manual review and attestation provided for this control (\"allowed domain\" for new-user invitations is consumer-policy-specific (which corporate domains are partner-approved). Operators attest from their identity-domain inventory.)"
+  uri          = input('c_4_5_attestation_uri', value: attestation_uri(:boundary, 'C-4.5'))
+  max_age_days = input('attestation_max_age_days', value: 365)
+  if uri.to_s.empty?
+    describe 'Requires manual review and attestation' do
+      skip "Requires manual review and attestation provided for this control (\"allowed domain\" for new-user invitations is consumer-policy-specific (which corporate domains are partner-approved). Operators attest from their identity-domain inventory.) [Lift to Pass-with-evidence: set boundary_docs_base / c_4_5_attestation_uri, or `saf attest apply`.]"
+    end
+  else
+    doc = document_attestation(uri, max_age_days: max_age_days)
+    describe "C-4.5 governance attestation (#{uri})" do
+      it('is reachable') { expect(doc.connection_error).to be_nil, "attestation unreachable: #{doc.connection_error}" }
+      it('exists') { expect(doc.exists?).to eq(true) }
+      it("current within #{max_age_days}d") { expect(doc.current?).to eq(true) }
+    end
   end
 end

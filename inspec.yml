@@ -184,6 +184,99 @@ inputs:
         structured assertions beyond presence (e.g., {"5.7":
         {"threshold": 3}}).
 
+  # ---- document_attestation evidence-class bases (sparc-validate#154) ----
+  - name: leveraged_evidence_base
+    type: string
+    value: ''
+    description: >-
+      Base for leveraged-SYSTEM authorizations (AWS FedRAMP / SOC 2 / ISO). No
+      inherited controls in this profile.
+  - name: policy_provider_base
+    type: string
+    value: ''
+    description: >-
+      Base for policy-PROVIDER documents the boundary leverages (shared /
+      templated / parent-org policies).
+  - name: boundary_docs_base
+    type: string
+    value: ''
+    description: >-
+      Base for the boundary system's OWN governance docs (IAM/MFA/image/site
+      review records) backing the C-2.x / C-4.x attestations.
+  - name: attestation_max_age_days
+    type: numeric
+    value: 365
+    description: >-
+      Shared staleness window (days) for the document_attestation evidence
+      controls in this profile.
+  # ---- automation inputs (sparc-validate#163) ----
+  - name: workspaces_remote_access_ports
+    type: array
+    value: [3389, 4172, 4195]
+    description: >-
+      Remote-access ports checked for 0.0.0.0/0 ingress on each WorkSpaces
+      directory security group (C-2.15): RDP 3389, PCoIP 4172, WSP 4195.
+  - name: appstream_image_max_age_days
+    type: numeric
+    value: 30
+    description: >-
+      Max age (days) for AppStream image builders before C-5.7 flags them
+      (CIS 5.7 cadence is 30 days).
+  - name: c_2_1_attestation_uri
+    type: string
+    value: ''
+    description: >-
+      Override URI of the C-2.1 governance attestation. Empty -> resolves via
+      boundary_docs_base; SKIPs if unset.
+  - name: c_2_2_attestation_uri
+    type: string
+    value: ''
+    description: >-
+      Override URI of the C-2.2 governance attestation. Empty -> resolves via
+      boundary_docs_base; SKIPs if unset.
+  - name: c_2_5_attestation_uri
+    type: string
+    value: ''
+    description: >-
+      Override URI of the C-2.5 governance attestation. Empty -> resolves via
+      boundary_docs_base; SKIPs if unset.
+  - name: c_2_11_attestation_uri
+    type: string
+    value: ''
+    description: >-
+      Override URI of the C-2.11 governance attestation. Empty -> resolves via
+      boundary_docs_base; SKIPs if unset.
+  - name: c_4_1_attestation_uri
+    type: string
+    value: ''
+    description: >-
+      Override URI of the C-4.1 governance attestation. Empty -> resolves via
+      boundary_docs_base; SKIPs if unset.
+  - name: c_4_2_attestation_uri
+    type: string
+    value: ''
+    description: >-
+      Override URI of the C-4.2 governance attestation. Empty -> resolves via
+      boundary_docs_base; SKIPs if unset.
+  - name: c_4_4_attestation_uri
+    type: string
+    value: ''
+    description: >-
+      Override URI of the C-4.4 governance attestation. Empty -> resolves via
+      boundary_docs_base; SKIPs if unset.
+  - name: c_4_5_attestation_uri
+    type: string
+    value: ''
+    description: >-
+      Override URI of the C-4.5 governance attestation. Empty -> resolves via
+      boundary_docs_base; SKIPs if unset.
+  - name: c_4_6_attestation_uri
+    type: string
+    value: ''
+    description: >-
+      Override URI of the C-4.6 governance attestation. Empty -> resolves via
+      boundary_docs_base; SKIPs if unset.
+
 supports:
   - platform: aws
 

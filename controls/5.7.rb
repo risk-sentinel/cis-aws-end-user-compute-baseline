@@ -82,7 +82,7 @@ control 'C-5.7' do
   tag cis_level:             1
   tag cis_scored:            true
   tag applicable_partitions: ['aws', 'aws-us-gov']
-  tag implementation_status: 'alternative'
+  tag implementation_status: 'implemented'
   tag exec_validated:        false
 
   applicable_partition = ['aws', 'aws-us-gov'].include?(input('aws_partition'))
@@ -96,7 +96,17 @@ control 'C-5.7' do
     applicable
   end
 
-  describe 'Requires manual review and attestation' do
-    skip "Requires manual review and attestation provided for this control (AppStream image OS-update cadence — every 30 days per CIS 5.7 — is image-build-pipeline scope. Auto-detection is feasible via aws_appstream_inventory.image_builders[*].created_time (flag any image_builder older than 30 days as an offender); tracked as a future enhancement. Operator attests via their image-bake schedule in the meantime.)"
+  inv = aws_appstream_inventory(regions: Array(input('scan_regions', value: [])))
+  if inv.connection_error
+    describe 'AppStream image-builder OS-update cadence (5.7)' do
+      skip "AppStream inventory unreachable (#{inv.connection_error}) — attest the image-bake schedule separately."
+    end
+  else
+    max_age   = input('appstream_image_max_age_days', value: 30)
+    offenders = inv.image_builders_older_than(max_age).map { |b| b[:name] }
+    describe "AppStream image builders older than #{max_age} days (CIS 5.7)" do
+      subject { offenders }
+      it { should be_empty }
+    end
   end
 end

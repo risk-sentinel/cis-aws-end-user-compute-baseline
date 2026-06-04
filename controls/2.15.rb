@@ -75,7 +75,7 @@ control 'C-2.15' do
   tag cis_level:             1
   tag cis_scored:            true
   tag applicable_partitions: ['aws', 'aws-us-gov']
-  tag implementation_status: 'alternative'
+  tag implementation_status: 'implemented'
   tag exec_validated:        false
 
   applicable_partition = ['aws', 'aws-us-gov'].include?(input('aws_partition'))
@@ -89,7 +89,23 @@ control 'C-2.15' do
     applicable
   end
 
-  describe 'Requires manual review and attestation' do
-    skip "Requires manual review and attestation provided for this control (WorkSpaces primary-interface ingress rules live on the workspace security group identified by workspace_security_group_id on each directory. Auto-detection requires fetching each directory's workspace_security_group_id and querying aws_security_group ingress rules for 0.0.0.0/0 entries on remote-access ports; tracked as a future enhancement. Operator inspects the directory SG via `aws ec2 describe-security-groups --group-ids <workspace_security_group_id>` in the meantime.)"
+  inv = aws_workspaces_inventory
+  if inv.connection_error
+    describe 'WorkSpaces directory remote-access SG ingress (2.15)' do
+      skip "WorkSpaces inventory unreachable (#{inv.connection_error}) — attest the directory security-group ingress separately."
+    end
+  else
+    ports  = Array(input('workspaces_remote_access_ports', value: [3389, 4172, 4195]))
+    sg_ids = Array(inv.directories).map { |d| d[:workspace_security_group_id] }.compact.reject { |x| x.to_s.empty? }.uniq
+    offenders = []
+    sg_ids.each do |sg|
+      group = aws_security_group(group_id: sg)
+      next unless group.exists?
+      ports.each { |p| offenders << "#{sg}:#{p}" if group.allow_in?(ipv4_range: '0.0.0.0/0', port: p) }
+    end
+    describe 'WorkSpaces directory SGs allowing 0.0.0.0/0 on remote-access ports (CIS 2.15)' do
+      subject { offenders }
+      it { should be_empty }
+    end
   end
 end

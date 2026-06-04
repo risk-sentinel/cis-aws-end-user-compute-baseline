@@ -90,6 +90,14 @@ class AwsAppStreamInventory < AwsResourceBase
     "AWS AppStream 2.0 inventory"
   end
 
+  # Image builders whose creation time is older than `days` — proxy for stale
+  # AppStream image OS-update cadence (CIS 5.7). created_time is the builder
+  # creation timestamp from describe_image_builders.
+  def image_builders_older_than(days)
+    cutoff = Time.now - (days.to_i * 86_400)
+    Array(@image_builders).select { |b| b[:created_time] && b[:created_time] < cutoff }
+  end
+
   private
 
   def fetch_default_regions
@@ -172,7 +180,7 @@ class AwsAppStreamInventory < AwsResourceBase
           return vpcs
         end
       Array(resp.image_builders).each do |b|
-        record = { region: region, name: b.name, vpc_config: b.vpc_config&.to_h }
+        record = { region: region, name: b.name, created_time: b.created_time, vpc_config: b.vpc_config&.to_h }
         @image_builders << record
         if b.vpc_config.nil? || Array(b.vpc_config&.subnet_ids).empty?
           @image_builders_without_vpc_config << record

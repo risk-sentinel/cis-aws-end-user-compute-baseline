@@ -119,6 +119,7 @@ control 'C-2.12' do
   tag cis_scored:            true
   tag applicable_partitions: ['aws', 'aws-us-gov']
   tag implementation_status: 'alternative'
+  tag attestation_category:  'operational'
   tag exec_validated:        false
 
   applicable_partition = ['aws', 'aws-us-gov'].include?(input('aws_partition'))
