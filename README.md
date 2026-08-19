@@ -1,161 +1,205 @@
-# AWS End User Compute Services CIS Baseline
+# cis-aws-end-user-compute-baseline
 
-InSpec / CINC Auditor profile validating an AWS account against **CIS AWS End User Compute Services Benchmark v1.2.0**.
+InSpec / CINC Auditor profile validating AWS end-user compute against the
+**CIS AWS End User Compute Services Benchmark v1.2.0** — 34 controls across
+WorkSpaces, AppStream 2.0 and WorkDocs.
 
-## Scope
-
-- **AWS Commercial** (`aws_partition=aws`) — primary target.
-- **AWS GovCloud non-DoD** (`aws_partition=aws-us-gov`) — primary target.
-- Azure and other cloud providers — out of scope.
-
-The benchmark covers four AWS services:
-
-| CIS section | Service | `applicable_services` value |
-|---|---|---|
-| 2 (18 controls) | Amazon WorkSpaces — desktop VDI | `workspaces` |
-| 3 (1 control) | AWS WorkSpaces Web — browser portal | `workspaces_web` |
-| 4 (8 controls) | Amazon WorkDocs | `workdocs` |
-| 5 (7 controls) | AWS AppStream 2.0 | `appstream` |
-
-Consumers that don't operate any of these services can leave `applicable_services` empty — every section auto-skips via `only_if`. Consumers running specific services list those (e.g., `applicable_services: [appstream, workdocs]`) and the relevant sections execute against the four local libraries (`aws_workspaces_inventory`, `aws_workspaces_web_inventory`, `aws_workdocs_inventory`, `aws_appstream_inventory`).
-
-Per-control partition applicability lives in `partition_applicability.yml` and is mirrored on each control via `tag applicable_partitions: [...]`.
-
-## Running Locally
-
-Prerequisites: Docker. Vendor once to pull the `inspec-aws` resource pack:
-
-```bash
-docker pull risksentinel/cinc-auditor@sha256:e483ae61a60ddcb9e6e9d782e79dbdeec87a3fe6271e59e96c332fc1d159d6f1
-
-docker run --rm -v "$PWD:/src" risksentinel/cinc-auditor@sha256:e483ae61a60ddcb9e6e9d782e79dbdeec87a3fe6271e59e96c332fc1d159d6f1 \
-  vendor /src/profiles/cis-aws-end-user-compute --overwrite
-```
-
-Execute against AWS Commercial:
-
-```bash
-docker run --rm \
-  -v "$PWD:/src" \
-  -e AWS_ACCESS_KEY_ID \
-  -e AWS_SECRET_ACCESS_KEY \
-  -e AWS_SESSION_TOKEN \
-  -e AWS_DEFAULT_REGION=us-east-1 \
-  risksentinel/cinc-auditor@sha256:e483ae61a60ddcb9e6e9d782e79dbdeec87a3fe6271e59e96c332fc1d159d6f1 exec /src/profiles/cis-aws-end-user-compute \
-  --input-file /src/profiles/cis-aws-end-user-compute/inputs.yml \
-  --reporter cli json:/src/hdf.json
-```
-
-GovCloud follows the same shape with `aws_partition=aws-us-gov` + `us-gov-west-1` region.
-
-## Portability
-
-| Input | Default | When to override |
-|---|---|---|
-| `aws_partition` | `aws` | Set to `aws-us-gov` for GovCloud non-DoD. |
-| `applicable_services` | `[]` (all sections) | Allowlist: `workspaces`, `workspaces_web`, `workdocs`, `appstream`. Sections out of scope auto-skip. |
-
-### Example: consumer not running any end-user-compute service
-
-```yaml
-aws_partition: aws
-# applicable_services intentionally unset — consumer doesn't operate
-# any of these services. Every control auto-skips with the pending-
-# resource rationale; the profile is shipped for future adopters.
-```
-
-### Example: consumer running WorkSpaces + AppStream
-
-```yaml
-aws_partition: aws
-applicable_services:
-  - workspaces
-  - appstream
-```
-
-## NIST 800-53 Tagging
-
-Every control carries `tag nist: [...]` resolved at scaffold time from the XCCDF's DISA CCI identifiers via Heimdall's `CciNistMappingData.ts`. Same provenance chain as the other AWS-side profiles in this repo.
-
-## Regenerating From XCCDF
-
-```bash
-python3 tools/xccdf_to_inspec/scaffold.py \
-  --xccdf benchmarks/xccdf/cis_aws_end_user_compute_services_benchmark_v120.xml \
-  --cci-map /path/to/heimdall2/libs/hdf-converters/src/mappings/CciNistMappingData.ts \
-  --output profiles/cis-aws-end-user-compute \
-  --profile-name cis-aws-end-user-compute \
-  --profile-title "AWS End User Compute Services CIS Baseline" \
-  --supports-platform aws
-```
-
-## Status
-
-All 34 controls filled (issue #15) and all `planned` controls closed via the v0.1.0 release-prep sweep. Each control carries a `tag implementation_status:` mapped to OSCAL's native vocabulary — see the [Control Classification Guide](../../docs/dev/Control_Classification_Guide.md).
-
-### Coverage distribution
-
-| Type | `implementation_status` | Count |
-|---|---|---|
-| **Automated** | `implemented` | 15 |
-| **Attestation** | `alternative` | 19 |
-| **Pending-resource** | `planned` | 0 |
-
-The 15 automated controls run via four custom libraries:
-- `aws_workspaces_inventory` — §2 (Amazon WorkSpaces; built into stock cinc-auditor).
-- `aws_workspaces_web_inventory` — §3 (WorkSpaces Web; needs `aws-sdk-workspacesweb` gem).
-- `aws_workdocs_inventory` — §4 (WorkDocs; needs `aws-sdk-workdocs` gem).
-- `aws_appstream_inventory` — §5 (AppStream 2.0; needs `aws-sdk-appstream` gem).
-
-The §3 / §4 / §5 gems are NOT bundled in upstream `cincproject/auditor`. Consumers run against the **Risk Sentinel extended cinc-auditor image** ([your CI image-bake tracker](https://example.invalid/cross-repo-issue)) — when it lands. Until then, the §3 / §4 / §5 controls fall back to attestation rationale at exec time via the `connection_error` accessor (per [`docs/dev/Vendored_Resource_Gaps.md` §5](../../docs/dev/Vendored_Resource_Gaps.md#5-connection-precheck-describe-for-network-crossing-resources)). Stock cinc-auditor still produces a clean HDF — every control either runs (with extended image) or skips with documented attestation rationale (with stock image). No silent failures.
-
-### Per-section breakdown
-
-| Section | Service | Controls | Implemented | Alternative | Planned |
-|---|---|---|---|---|---|
-| 2 | Amazon WorkSpaces | 18 | 8 | 10 | 0 |
-| 3 | AWS WorkSpaces Web | 1 | 1 | 0 | 0 |
-| 4 | Amazon WorkDocs | 8 | 3 | 5 | 0 |
-| 5 | AWS AppStream 2.0 | 7 | 3 | 4 | 0 |
-
-### `aws_workspaces_inventory` custom resource
-
-`libraries/aws_workspaces_inventory.rb` wraps the AWS WorkSpaces Ruby client and exposes offender-list helpers:
-
-| Helper | CIS control |
-|---|---|
-| `workspaces_unencrypted_volumes` | 2.3 |
-| `directories_not_in_dedicated_vpc` | 2.4 |
-| `directories_with_web_access_enabled` | 2.6 |
-| `directories_without_ip_group_restriction` | 2.7 |
-| `directories_without_fips_endpoint` | 2.16 |
-| `directories_with_weak_radius_protocol` | 2.18 |
-| `workspaces_in_unhealthy_state` | 2.14 |
-| `images_older_than(days)` | 2.13 |
-
-Each method paginates the relevant `describe_*` call and returns a list of offending IDs (empty list = passing).
-
-### Local libraries
-
-Four service-specific custom resources cover §2 / §3 / §4 / §5:
-
-| Library | Section | Service client | Key accessors |
-|---|---|---|---|
-| `aws_workspaces_inventory.rb` | §2 | `Aws::WorkSpaces::Client` (built-in) | `workspaces_unencrypted_volumes`, `directories_not_in_dedicated_vpc`, `directories_with_web_access_enabled`, `directories_without_ip_group_restriction`, `directories_without_fips_endpoint`, `directories_with_weak_radius_protocol`, `workspaces_in_unhealthy_state`, `images_older_than(days)` |
-| `aws_workspaces_web_inventory.rb` | §3 | `Aws::WorkSpacesWeb::Client` (needs `aws-sdk-workspacesweb`) | `portals`, `portals_without_user_access_logging`, `connection_error` |
-| `aws_workdocs_inventory.rb` | §4 | `Aws::WorkDocs::Client` (needs `aws-sdk-workdocs`) | `organizations`, `organizations_without_ip_allowlist`, `organizations_allowing_public_share`, `inactive_users`, `connection_error` |
-| `aws_appstream_inventory.rb` | §5 | `Aws::AppStream::Client` + `Aws::EC2::Client` (needs `aws-sdk-appstream`) | `fleets`, `image_builders`, `fleets_without_vpc_config`, `image_builders_without_vpc_config`, `vpcs_without_appstream_endpoint`, `fleets_using_default_internet_access`, `connection_error` |
-
-Each per-region client is instantiated directly (rather than via the inspec-aws class-keyed cache) so multi-region scans don't serialize through one client. Each library handles `AccessDenied` / `NoSuch...` per-call to fail-fast on a missing IAM permission rather than silently producing empty results. The `connection_error` accessor lets the calling control fall back to attestation cleanly when the SDK gem is missing (stock cinc-auditor) or AccessDenied is returned at the partition / account level.
-
-### `exec_validated` semantics
-
-Every control carries `tag exec_validated: false`. cinc-auditor `check` passes; live exec validation depends on a consumer running these services. The flag flips when a consumer scan exercises the implementations.
-
-## See also
-
-Top-level `README.md` for overall repo state and the sub-issue tracker for per-profile progress.
+Targets **AWS Commercial** and **AWS GovCloud (non-DoD)**. Per-control partition
+applicability is in [`partition_applicability.yml`](partition_applicability.yml)
+and encoded as `tag applicable_partitions:`.
 
 ---
 
-[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=risk-sentinel_cis-aws-end-user-compute-v1.2.0)](https://sonarcloud.io/summary/new_code?id=risk-sentinel_cis-aws-end-user-compute-v1.2.0)
+## Quickstart
+
+```bash
+git clone https://github.com/risk-sentinel/cis-aws-end-user-compute-baseline
+cd cis-aws-end-user-compute-baseline
+
+cp inputs/example.yml inputs/mine.yml     # then edit — see Inputs below
+cinc-auditor vendor . --overwrite
+
+cinc-auditor exec . -t aws:// \
+  --input-file inputs/mine.yml \
+  --reporter cli json:results.json
+```
+
+### Credentials
+
+Standard AWS credential resolution. Read-only across the EUC surface:
+
+```
+workspaces:Describe*   appstream:Describe*   workdocs:Describe*
+ds:DescribeDirectories  ec2:DescribeSecurityGroups  ec2:DescribeRegions
+kms:DescribeKey         iam:GetRole
+```
+
+### What a first run looks like
+
+Against a real account, scoped to one region, with the attestation URIs empty:
+
+**34 controls, 35 results — roughly 23 passed / 1 failed / 11 skipped.**
+
+**The skips are the point, not a fault.** This profile has the highest
+attestation density in the estate — nine of its inputs are attestation URIs —
+and with them empty those controls skip with a rationale rather than passing. If
+you see far fewer than 35 results, that is a different problem and worth
+investigating.
+
+---
+
+## Inputs
+
+Fully documented in [`inputs/example.yml`](inputs/example.yml).
+
+| Group | Inputs |
+|---|---|
+| **Required** | `aws_partition` |
+| **Scoping** | `applicable_services`, `scan_regions` |
+| **Thresholds** | `approved_workspaces_bundles`, `workspaces_remote_access_ports`, `workspaces_require_radius_mfa`, `workdocs_inactive_threshold_days`, `appstream_image_max_age_days` |
+| **Logging** | `logging_strategy`, `logging_requirements`, `logging_attestation_reference` |
+| **Attestation** | four `euc_*_attestation_reference` strings, the `*_base` URIs, nine `c_*_attestation_uri` overrides |
+
+**Nine attestation URIs is the defining feature of this profile.** WorkSpaces,
+AppStream and WorkDocs expose relatively little through their APIs, and much of
+what CIS asks about — image-pipeline governance, site configuration, MFA design
+— is a documented decision rather than a queryable setting. Those controls skip
+with a rationale until you point them at evidence. A mostly-skipped first run is
+the profile telling you which documents it needs.
+
+**`approved_workspaces_bundles` empty is not "all bundles approved".** It means
+the control has nothing to check against and reports that.
+
+---
+
+## Controls
+
+34 controls across three services:
+
+| Service | Assesses |
+|---|---|
+| WorkSpaces | volume encryption, running mode, remote-access exposure, directory MFA, approved bundles, maintenance |
+| AppStream 2.0 | fleet and image-builder network placement, image currency, session storage and clipboard policy |
+| WorkDocs | sharing and external-collaboration posture, inactive users, audit logging |
+
+---
+
+## Producing evidence
+
+A `--reporter cli` run tells you the answer. It does not produce something an
+assessor can trace back to what was assessed, when, by whom, or from which
+scanner output. For that, use the CI templates — the whole pipeline, in YAML
+with no helper scripts behind it:
+
+**GitHub**
+
+```yaml
+jobs:
+  evidence:
+    uses: risk-sentinel/cis-aws-end-user-compute-baseline/.github/workflows/exec-evidence.yml@main
+    with:
+      target: my-account
+      profile_name: cis-aws-end-user-compute-v1.2.0
+      profile_version: "0.1.0"
+    secrets:
+      AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+```
+
+**GitLab**
+
+```yaml
+include:
+  - project: risk-sentinel/cis-aws-end-user-compute-baseline
+    file: /ci/gitlab/exec-evidence.yml
+    inputs:
+      target: my-account
+      profile_name: cis-aws-end-user-compute-v1.2.0
+      profile_version: "0.1.0"
+```
+
+An `include:` brings YAML and nothing else, which is why the logic lives in the
+YAML rather than in a script an including project would never receive. The
+templates are carried in this repository on purpose: clone it or include it and
+you have the entire pipeline, with nothing else to install.
+
+### The order, and why it is that order
+
+```
+create passthrough -> execute -> convert (gate) -> apply -> label (gate)
+                   -> validate (gate) -> display
+```
+
+The audit record is built **before** the scan, because that is when the honest
+start time and the pipeline provenance are known. Only finish time, the artifact
+digest and the outcome counts are added afterwards.
+
+### Two artifacts
+
+| artifact | shape | for |
+|---|---|---|
+| `results.final.json` | HDF v3 `baselines[]` | authoritative evidence — schema-validated, carries the audit record and typed target components, feeds `hdf convert --to oscal-sar` |
+| `results-heimdall.json` | InSpec exec-json `profiles[]` | loading into Heimdall |
+
+The Heimdall artifact is a **copy, not a conversion**. Tested against a live
+Heimdall: every `profiles[]` variant loads, including the output of both
+`--to hdf@1` and `--to hdf@2`; only the `baselines[]` v3 document is refused. So
+the choice is fidelity, and every conversion path drops `resource_params` from
+each result plus `depends` / `status` / `status_message` from the profile.
+Copying what cinc-auditor already wrote loses nothing.
+
+**Do not reach for `hdf convert --to hdf@2`.** The `hdf@N` namespace was
+renumbered between hdf-libs 3.4.1 and 3.5.1 — on 3.4.1 it emits `baselines[]`,
+on 3.5.1 `profiles[]` — so a pipeline pinned to it silently changes artifact
+across an image bump. On 3.5.1, `@1` and `@2` are byte-identical.
+
+### Three gates, each of which has failed silently in this estate
+
+- `hdf convert` without `--no-validate`
+- `hdf label` followed by `hdf label show | grep '^Component:'` — `label set`
+  prints `Labels written` and writes a byte-identical file when the document has
+  no components
+- `hdf validate`
+
+The exec step additionally fails the job on a missing or **zero-result**
+artifact. A run that assessed nothing must not go green.
+
+### The audit record
+
+Written on every run — clean, failed, findings or none. Target, scan window,
+scanner, profile and version, pipeline provenance, actor, converter, a sha256 of
+the pre-conversion artifact, and outcome counts.
+
+Two properties are deliberate: **absent is not empty** (an inapplicable field is
+omitted, an undeterminable one is `null` with a reason), and the record **marks
+which fields are corroborable** against systems the producer does not control.
+An audit chain where every field is self-asserted is a story.
+
+Schema authority: [dev-sec-ops-baseline#33](https://github.com/risk-sentinel/dev-sec-ops-baseline/issues/33).
+
+---
+
+## Consuming this profile
+
+Depend on it rather than forking, so you get fixes:
+
+```yaml
+depends:
+  - name: cis-aws-end-user-compute-v1.2.0
+    git: https://github.com/risk-sentinel/cis-aws-end-user-compute-baseline.git
+    tag: v0.1.5
+```
+
+Then `include_controls 'cis-aws-end-user-compute-v1.2.0'` and supply your own inputs. Input overrides
+reach the depended profile's controls, so your values win without editing
+anything here.
+
+## Contributing
+
+Control logic changes belong here. `cinc-auditor check` only *loads* a profile —
+it will not catch a resource that returns empty because an API call failed.
+Anything touching `libraries/` needs a real `exec` against a real target before
+it is trusted.
+
+## License
+
+Apache-2.0. See [LICENSE](LICENSE).
