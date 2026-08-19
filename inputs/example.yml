@@ -1,0 +1,91 @@
+# =============================================================================
+# cis-aws-end-user-compute-baseline — reference inputs
+#
+#   cp inputs/example.yml inputs/mine.yml   # edit, then:
+#   cinc-auditor exec . -t aws:// --input-file inputs/mine.yml
+#
+# --input-file is NOT optional.
+#
+# READ THIS FIRST: nine of these inputs are attestation URIs, and this profile
+# has the highest attestation density in the estate. With them empty, a large
+# share of the run skips with a rationale rather than passing. That is the
+# profile working correctly — but a first run will look thin, and knowing why
+# up front saves you concluding it does nothing.
+# =============================================================================
+
+# ---- REQUIRED TO RUN --------------------------------------------------------
+
+# Which AWS partition is being scanned.
+#   aws         AWS Commercial
+#   aws-us-gov  AWS GovCloud (non-DoD)
+aws_partition: aws
+
+# ---- SCOPING ----------------------------------------------------------------
+
+# Which end-user-compute services to assess: WorkSpaces, AppStream, WorkDocs.
+# EMPTY = assess whatever is discovered and scope out what is not deployed.
+# Naming them is faster and makes the denominator obvious.
+#   applicable_services: [workspaces]
+applicable_services: []
+
+# Regions to enumerate. EMPTY = every region, discovered dynamically.
+scan_regions: []
+
+# ---- POLICY THRESHOLDS ------------------------------------------------------
+
+# WorkSpaces bundles approved for use.
+# EMPTY = no bundle policy is enforced and the control reports that it has
+# nothing to check against — not that every bundle is approved.
+approved_workspaces_bundles: []
+
+# Ports a WorkSpace may expose for remote access. The defaults are the PCoIP and
+# WSP ports WorkSpaces actually uses; widening this widens exposure.
+workspaces_remote_access_ports: [3389, 4172, 4195]
+
+# Require RADIUS-backed MFA on WorkSpaces directories. Default off because
+# RADIUS MFA is one of several valid designs — turn it on when it is yours.
+workspaces_require_radius_mfa: false
+
+# Days a WorkDocs user may be inactive before being flagged.
+workdocs_inactive_threshold_days: 30
+
+# Maximum age of an AppStream image before it is considered stale.
+appstream_image_max_age_days: 30
+
+# ---- LOGGING STRATEGY -------------------------------------------------------
+
+# How logging is satisfied for this boundary.
+#   custom  you define the requirements below
+# EMPTY logging_requirements = the logging control cannot be evaluated against
+# anything concrete and skips with a rationale.
+logging_strategy: custom
+logging_requirements: {}
+logging_attestation_reference: ''
+
+# ---- ATTESTATION — the bulk of this profile ---------------------------------
+#
+# Free-form references for the four governance areas no EUC API can answer.
+euc_iam_attestation_reference: ''
+euc_mfa_attestation_reference: ''
+euc_image_pipeline_attestation_reference: ''
+euc_site_config_attestation_reference: ''
+
+# Evidence-class bases.
+leveraged_evidence_base: ''
+policy_provider_base: ''
+boundary_docs_base: ''
+attestation_max_age_days: 365
+
+# Direct URI overrides for the nine individually-attested controls.
+# EMPTY = resolved from boundary_docs_base; if that is empty too, each skips
+# with a rationale. These are what a mostly-skipped first run is telling you to
+# populate.
+c_2_1_attestation_uri: ''
+c_2_2_attestation_uri: ''
+c_2_5_attestation_uri: ''
+c_2_11_attestation_uri: ''
+c_4_1_attestation_uri: ''
+c_4_2_attestation_uri: ''
+c_4_4_attestation_uri: ''
+c_4_5_attestation_uri: ''
+c_4_6_attestation_uri: ''
