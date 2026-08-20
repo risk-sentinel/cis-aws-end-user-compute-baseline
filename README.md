@@ -1,5 +1,7 @@
 # cis-aws-end-user-compute-baseline
 
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=risk-sentinel_cis-aws-end-user-compute-v1.2.0)](https://sonarcloud.io/summary/new_code?id=risk-sentinel_cis-aws-end-user-compute-v1.2.0)
+
 InSpec / CINC Auditor profile validating AWS end-user compute against the
 **CIS AWS End User Compute Services Benchmark v1.2.0** — 34 controls across
 WorkSpaces, AppStream 2.0 and WorkDocs.
