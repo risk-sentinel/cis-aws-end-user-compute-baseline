@@ -22,7 +22,8 @@ of a checkable fact.** This matrix makes the trust boundary auditable.
 
 Each attestation keeps a `document_attestation` freshness floor.
 
-## Note (zero SPARC scope)
-SPARC runs no WorkSpaces/WorkDocs/AppStream; these checks are `exec_validated: false`
-and exist for non-SPARC consumers. Verification logic must be validated against a
+## Note (no in-house scope)
+No end-user-compute services run in-house here; these checks are
+`exec_validated: false` and exist for consumers that do run them. Verification
+logic must be validated against a
 real deployment before being relied upon.

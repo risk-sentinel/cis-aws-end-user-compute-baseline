@@ -184,7 +184,7 @@ inputs:
         structured assertions beyond presence (e.g., {"5.7":
         {"threshold": 3}}).
 
-  # ---- document_attestation evidence-class bases (sparc-validate#154) ----
+  # ---- document_attestation evidence-class bases ----
   - name: leveraged_evidence_base
     type: string
     value: ''
@@ -209,7 +209,7 @@ inputs:
     description: >-
       Shared staleness window (days) for the document_attestation evidence
       controls in this profile.
-  # ---- automation inputs (sparc-validate#163) ----
+  # ---- automation inputs ----
   - name: workspaces_remote_access_ports
     type: array
     value: [3389, 4172, 4195]

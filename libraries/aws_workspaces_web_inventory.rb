@@ -7,8 +7,8 @@
 # through one client (see aws_iam_access_analyzers.rb for the precedent).
 #
 # Defensive `aws-sdk-workspacesweb` require: the upstream cinc-auditor
-# image (7.0.107) does NOT bundle aws-sdk-workspacesweb. The Risk Sentinel
-# extended image (filed as your CI image-bake tracker) does. When this library runs
+# image (7.0.107) does NOT bundle aws-sdk-workspacesweb. An extended
+# image (filed as your CI image-bake tracker) does. When this library runs
 # under the upstream image, the require fails and we surface the failure
 # via a `connection_error` accessor so the calling control falls back to
 # attestation rationale (per docs/dev/Vendored_Resource_Gaps.md §5).

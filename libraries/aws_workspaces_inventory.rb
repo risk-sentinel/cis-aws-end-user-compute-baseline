@@ -2,8 +2,8 @@ require "time"
 
 # Explicit require because the vendored inspec-aws aws_backend.rb does
 # not require aws-sdk-workspaces (its require list at lines 5-64 omits
-# it). The gem itself is baked into the risksentinel/cinc-auditor:26.0.1-rs1
-# image (the consumer's IaC pipeline Dockerfile line 70), but `Aws::WorkSpaces::Client`
+# it). The gem is baked into the extended auditor image used in CI, but
+# `Aws::WorkSpaces::Client`
 # isn't reachable without an explicit require here.
 begin
   require "aws-sdk-workspaces"
@@ -72,7 +72,7 @@ class AwsWorkspacesInventory < AwsResourceBase
   # All fetch_* methods below catch NoMethodError as well as
   # Aws::Errors::ServiceError. Reason: AwsConnection#workspaces_client
   # is only defined when `aws-sdk-workspaces` is on the gem path. The
-  # custom risksentinel/cinc-auditor image (your CI image-bake tracker) bundles 10
+  # extended auditor image (your CI image-bake tracker) bundles 10
   # aws-sdk-* gems; aws-sdk-workspaces is not currently among them, so
   # `@aws.workspaces_client` raises NoMethodError at runtime. Without
   # this rescue, the resource crashes during init and every cis-aws-end-
