@@ -15,7 +15,7 @@ summary: |
   `aws_workdocs_inventory` (§4), and `aws_appstream_inventory` (§5).
   §3/§4/§5 require the `aws-sdk-workspacesweb` / `aws-sdk-workdocs` /
   `aws-sdk-appstream` gems which are not in the upstream cinc-auditor
-  image — use the Risk Sentinel extended image (your CI image-bake tracker) or the
+  image — use an extended auditor image (your CI image-bake tracker) or the
   controls fall back to attestation rationale at exec time.
 
   Per-control partition applicability is documented in
@@ -56,7 +56,7 @@ inputs:
       `aws_workdocs_inventory` (§4 — needs aws-sdk-workdocs), and
       `aws_appstream_inventory` (§5 — needs aws-sdk-appstream). The
       §3/§4/§5 gems are NOT bundled in upstream cinc-auditor; consumers
-      use the Risk Sentinel extended image (your CI image-bake tracker) or the
+      use an extended auditor image (your CI image-bake tracker) or the
       affected controls fall back to attestation rationale at exec
       time via the connection_error pattern (per
       docs/dev/Vendored_Resource_Gaps.md §5).
