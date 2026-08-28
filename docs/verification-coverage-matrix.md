@@ -6,10 +6,10 @@ of a checkable fact.** This matrix makes the trust boundary auditable.
 
 | Control | Disposition | Notes |
 |---|---|---|
-| C-2.10 maintenance mode | **VERIFY** | `directories[].workspace_creation_properties.enable_maintenance_mode` (#163) |
-| C-2.15 directory SG ingress | **VERIFY** | `workspace_security_group_id` + `aws_security_group` (#163) |
-| C-5.7 AppStream image age | **VERIFY** | `image_builders_older_than` (#163) |
-| C-2.12 approved bundles | dual-mode | input-gated automation (#163) |
+| C-2.10 maintenance mode | **VERIFY** | `directories[].workspace_creation_properties.enable_maintenance_mode` |
+| C-2.15 directory SG ingress | **VERIFY** | `workspace_security_group_id` + `aws_security_group` |
+| C-5.7 AppStream image age | **VERIFY** | `image_builders_older_than` |
+| C-2.12 approved bundles | dual-mode | input-gated automation |
 | **C-2.2 MFA** | **VERIFY (Phase C)** | RADIUS-MFA verified via `radius_settings` when `workspaces_require_radius_mfa: true`; AD-native MFA = documented residual |
 | **C-2.5 NAT routing** | **VERIFY (in-profile)** | `aws_workspaces_egress_routing` joins each directory's `subnet_ids` → route table; flags any subnet with a public (igw) default route. Built in-profile per each_profile_stands_alone (no VPC-profile deferral). exec_validated:false. |
 | **C-2.1 admin via IAM** | **VERIFY (in-profile)** | `aws_workspaces_admin_iam` scans customer-managed policies for broad `workspaces:*` admin on `Resource:*` (least-privilege). Built in-profile per each_profile_stands_alone (NOT deferred to foundations §1). exec_validated:false. |
