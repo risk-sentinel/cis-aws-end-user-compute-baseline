@@ -62,6 +62,7 @@ control 'C-5.2' do
     Traffic for new streaming sessions will be routed through this endpoint. However, traffic for current streaming sessions continues to be routed through the previously specified endpoint.
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['AC-8 a']
   tag cci:                   ['CCI-000051']
   tag cis_number:            '5.2'

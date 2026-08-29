@@ -43,7 +43,10 @@ control 'C-4.4' do
     6. Export the activity feed as a .csv or .json file.  Any filters you applied are reflected in the exported file.
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['AC-2 f', 'AU-2 a']
+  tag ksi:                   ['KSI-CMT-LMC', 'KSI-IAM-APM', 'KSI-IAM-JIT', 'KSI-IAM-SNU', 'KSI-IAM-SUS', 'KSI-MLA-LET', 'KSI-MLA-OSM', 'KSI-MLA-RVL']
+  tag nist_r4:               ['AC-2 f', 'AU-2 a']
   tag cci:                   ['CCI-000011', 'CCI-000123']
   tag cis_number:            '4.4'
   tag cis_rid:               '4.4'

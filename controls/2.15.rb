@@ -65,7 +65,10 @@ control 'C-2.15' do
     Note - Make sure you have all the required ports add to Inbound rules as listed in the WorkSpaces documentation outlined in the references so that connectivity to WorkSpaces is not impacted.
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['AC-3', 'SC-7 a', 'PM-5', 'AC-8 a']
+  tag ksi:                   ['KSI-CNA-ULN', 'KSI-IAM-APM', 'KSI-IAM-ELP', 'KSI-IAM-JIT', 'KSI-SVC-EIS']
+  tag nist_r4:               ['AC-3', 'PM-5', 'SC-7 a']
   tag cci:                   ['CCI-000213', 'CCI-001097', 'CCI-000207', 'CCI-000051']
   tag cis_number:            '2.15'
   tag cis_rid:               '2.15'

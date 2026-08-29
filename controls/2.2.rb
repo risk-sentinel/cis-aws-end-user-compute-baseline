@@ -117,7 +117,10 @@ control 'C-2.2' do
     7. Click `Save`
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['IA-2 (2)', 'SI-2 a']
+  tag ksi:                   ['KSI-CMT-VTD', 'KSI-IAM-APM']
+  tag nist_r4:               ['IA-2 (2)', 'SI-2 a']
   tag cci:                   ['CCI-000766', 'CCI-001225']
   tag cis_number:            '2.2'
   tag cis_rid:               '2.2'

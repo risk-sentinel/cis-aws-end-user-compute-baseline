@@ -157,6 +157,7 @@ control 'C-2.4' do
     8. Repeat steps 1-7 under `Verify and Name the Route Tables for Private' for `WorkSpaces Private Subnet 2`
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['AC-8 a']
   tag cci:                   ['CCI-000051']
   tag cis_number:            '2.4'
