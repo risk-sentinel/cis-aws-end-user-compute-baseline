@@ -156,6 +156,7 @@ control 'C-5.1' do
     16. On the Routes tab, confirm one destination and target for local traffic and another destination and target that sends all other traffic to the NAT gateway (example, nat-06ea352539b2fddfc).
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['AC-8 a']
   tag cci:                   ['CCI-000051']
   tag cis_number:            '5.1'

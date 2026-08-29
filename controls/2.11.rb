@@ -35,6 +35,7 @@ control 'C-2.11' do
     5. Create a workspace bundle that can then be used to launch your production WorkSpaces instances.
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['CM-6 a', 'AC-2 a']
   tag cci:                   ['CCI-000364', 'CCI-002110']
   tag cis_number:            '2.11'

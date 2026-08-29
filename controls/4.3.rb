@@ -51,6 +51,7 @@ control 'C-4.3' do
     7. Click `Save Changes`.
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['AC-3', 'AC-8 a']
   tag cci:                   ['CCI-000213', 'CCI-000051']
   tag cis_number:            '4.3'

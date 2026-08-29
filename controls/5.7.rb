@@ -72,6 +72,7 @@ control 'C-5.7' do
     Install Operating system updates and install, configure and update your applications for streaming, and then create an image by creating a snapshot of the image builder instance.
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['CM-6 a', 'AC-2 a']
   tag cci:                   ['CCI-000364', 'CCI-002110']
   tag cis_number:            '5.7'

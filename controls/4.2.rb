@@ -141,6 +141,7 @@ control 'C-4.2' do
     2. Repeat step 1 for other AD Connectors and the Selected regions.
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['IA-2 (2)', 'SI-2 a']
   tag cci:                   ['CCI-000766', 'CCI-001225']
   tag cis_number:            '4.2'

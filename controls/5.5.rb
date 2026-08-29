@@ -43,6 +43,7 @@ control 'C-5.5' do
     6. Change the Idle disconnect timeout to 5 minutes or less and click `Save changes`
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['CM-6 b']
   tag cci:                   ['CCI-000366']
   tag cis_number:            '5.5'

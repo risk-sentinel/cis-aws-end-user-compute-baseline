@@ -77,6 +77,7 @@ control 'C-2.17' do
     ```
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['SC-4', 'SI-4 a 1']
   tag cci:                   ['CCI-001090', 'CCI-001253']
   tag cis_number:            '2.17'

@@ -41,6 +41,7 @@ control 'C-4.7' do
     4. Select - `No public sharing`. - Users cannot send view links to anyone outside the organization.
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['AC-3', 'AC-8 a']
   tag cci:                   ['CCI-000213', 'CCI-000051']
   tag cis_number:            '4.7'
