@@ -80,6 +80,7 @@ control 'C-2.9' do
   tag severity:              'medium'
   tag severity_source:       'unassessed'
   tag nist:                  ['AC-2 f', 'IA-2 (2)', 'AU-2 a', 'AU-5 b']
+  tag ksi:                   ['KSI-CMT-LMC', 'KSI-IAM-APM', 'KSI-IAM-JIT', 'KSI-IAM-SNU', 'KSI-IAM-SUS', 'KSI-MLA-LET', 'KSI-MLA-OSM', 'KSI-MLA-RVL']
   tag nist_r4:               ['AC-2 f', 'AU-2 a', 'AU-5 b', 'IA-2 (2)']
   tag cci:                   ['CCI-000011', 'CCI-000766', 'CCI-000123', 'CCI-000140']
   tag cis_number:            '2.9'

@@ -111,6 +111,7 @@ control 'C-2.14' do
   tag severity:              'medium'
   tag severity_source:       'unassessed'
   tag nist:                  ['CM-8 a 1', 'MP-6 a']
+  tag ksi:                   ['KSI-PIY-GIV']
   tag nist_r4:               ['CM-8 a 1', 'MP-6 a']
   tag cci:                   ['CCI-000389', 'CCI-001028']
   tag cis_number:            '2.14'

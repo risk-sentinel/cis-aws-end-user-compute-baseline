@@ -110,6 +110,7 @@ control 'C-2.12' do
   tag severity:              'medium'
   tag severity_source:       'unassessed'
   tag nist:                  ['CM-11 a', 'CM-7 a']
+  tag ksi:                   ['KSI-CMT-RMV', 'KSI-IAM-JIT']
   tag nist_r4:               ['CM-11 a', 'CM-7 a']
   tag cci:                   ['CCI-001805', 'CCI-000381']
   tag cis_number:            '2.12'
