@@ -1,0 +1,61 @@
+# Which custom resources must enumerate every enabled region, and how the
+# harness should construct and observe each one.
+#
+# Each entry:
+#   resource  - the library file under libraries/ (without .rb)
+#   klass     - the Ruby class it defines
+#   args      - constructor keyword args. NOT optional in practice: several
+#               resources iterate a list supplied here and do no work at all
+#               without it, which makes a correct resource look region-blind.
+#   watch     - service + operation whose per-region invocation proves the walk,
+#               plus an optional `payload` for operations with required response
+#               members. NEVER watch describe_regions: that is the one-off
+#               discovery call made against the default client, so it proves
+#               nothing about the walk.
+#   status    - `enforced` must query every region and fails the build if it
+#               regresses. `known_blind` is reported without failing, so this
+#               harness can land before the fixes. `unobservable` means the walk
+#               cannot be seen through a stubbed client and requires a `reason`
+#               — it is NOT a defect, do not "fix" those.
+#
+# DELIBERATELY NOT LISTED — global services. Region enumeration is meaningless
+# for these, and a future sweep should not "fix" them:
+#   aws_workspaces_admin_iam - @aws.iam_client; IAM is a global service.
+#
+# Note on #30: it lists aws_workspaces_inventory as region-blind. It is not —
+# it builds a client per region. Measured, not assumed.
+
+regions: [us-east-1, us-west-2, eu-west-1]
+
+resources:
+  - resource: aws_appstream_inventory
+    klass: AwsAppStreamInventory
+    watch: { service: appstream, operation: describe_fleets }
+    status: enforced
+
+  - resource: aws_cloudwatch_alarms_coverage
+    klass: AwsCloudwatchAlarmsCoverage
+    # Iterates `namespaces`; with none supplied it does no work and looks blind.
+    args: { namespaces: ["AWS/WorkSpaces"] }
+    watch: { service: cloudwatch, operation: describe_alarms }
+    status: enforced
+
+  - resource: aws_workdocs_inventory
+    klass: AwsWorkDocsInventory
+    watch: { service: workdocs, operation: describe_resource_permissions }
+    status: enforced
+
+  - resource: aws_workspaces_inventory
+    klass: AwsWorkspacesInventory
+    watch: { service: workspaces, operation: describe_workspaces }
+    status: enforced
+
+  - resource: aws_workspaces_web_inventory
+    klass: AwsWorkSpacesWebInventory
+    watch: { service: workspacesweb, operation: list_portals }
+    status: enforced
+
+  - resource: aws_workspaces_egress_routing
+    klass: AwsWorkspacesEgressRouting
+    watch: { service: ec2, operation: describe_route_tables }
+    status: known_blind
