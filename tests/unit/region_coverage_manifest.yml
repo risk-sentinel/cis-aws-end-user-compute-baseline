@@ -30,32 +30,50 @@ regions: [us-east-1, us-west-2, eu-west-1]
 resources:
   - resource: aws_appstream_inventory
     klass: AwsAppStreamInventory
-    watch: { service: appstream, operation: describe_fleets }
+    watch:
+      service: appstream
+      operation: describe_fleets
+      payload: { fleets: [] }
     status: enforced
 
   - resource: aws_cloudwatch_alarms_coverage
     klass: AwsCloudwatchAlarmsCoverage
     # Iterates `namespaces`; with none supplied it does no work and looks blind.
     args: { namespaces: ["AWS/WorkSpaces"] }
-    watch: { service: cloudwatch, operation: describe_alarms }
+    watch:
+      service: cloudwatch
+      operation: describe_alarms
+      payload: { metric_alarms: [] }
     status: enforced
 
   - resource: aws_workdocs_inventory
     klass: AwsWorkDocsInventory
-    watch: { service: workdocs, operation: describe_resource_permissions }
+    watch:
+      service: workdocs
+      operation: describe_resource_permissions
+      payload: { principals: [] }
     status: enforced
 
   - resource: aws_workspaces_inventory
     klass: AwsWorkspacesInventory
-    watch: { service: workspaces, operation: describe_workspaces }
+    watch:
+      service: workspaces
+      operation: describe_workspaces
+      payload: { workspaces: [] }
     status: enforced
 
   - resource: aws_workspaces_web_inventory
     klass: AwsWorkSpacesWebInventory
-    watch: { service: workspacesweb, operation: list_portals }
+    watch:
+      service: workspacesweb
+      operation: list_portals
+      payload: { portals: [] }
     status: enforced
 
   - resource: aws_workspaces_egress_routing
     klass: AwsWorkspacesEgressRouting
-    watch: { service: ec2, operation: describe_route_tables }
+    watch:
+      service: ec2
+      operation: describe_route_tables
+      payload: { route_tables: [] }
     status: known_blind
