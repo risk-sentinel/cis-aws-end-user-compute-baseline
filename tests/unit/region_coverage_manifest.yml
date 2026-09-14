@@ -52,7 +52,14 @@ resources:
       service: workdocs
       operation: describe_resource_permissions
       payload: { principals: [] }
-    status: enforced
+    # NOT a region defect and not dead code. list_organizations deliberately sets
+    # @connection_error: describe_organizations is not in the WorkDocs SDK, site
+    # IDs require AWS Directory Service, and AWS deprecated WorkDocs 2025-04-25 —
+    # the consumer attests site-level controls separately. The resource therefore
+    # makes no AWS calls at all and correctly reports that it could not assess,
+    # which is the behaviour we want. Nothing to "fix" here.
+    status: unobservable
+    reason: "deliberately not implemented — WorkDocs deprecated; site controls attested separately, so no AWS calls are made"
 
   - resource: aws_workspaces_inventory
     klass: AwsWorkspacesInventory
@@ -81,4 +88,10 @@ resources:
       service: ec2
       operation: describe_route_tables
       payload: { route_tables: [] }
-    status: known_blind
+    # HARNESS LIMITATION. It reaches a sibling resource via the InSpec DSL
+    # (`inspec.aws_workspaces_inventory`), and `inspec` is nil outside InSpec's
+    # resource machinery, so construction raises here but works in a real exec.
+    # Its region posture is inherited from aws_workspaces_inventory, which IS
+    # tracked above as known_blind — so the coverage question is not lost.
+    status: unobservable
+    reason: "calls inspec.aws_workspaces_inventory; the InSpec DSL accessor is unavailable outside a real exec"
