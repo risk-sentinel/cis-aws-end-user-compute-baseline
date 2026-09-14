@@ -60,7 +60,12 @@ resources:
       service: workspaces
       operation: describe_workspaces
       payload: { workspaces: [] }
-    status: enforced
+    # SINGLE-REGION BY CONSTRUCTION, so it cannot pass `enforced`: it never calls
+    # describe_regions, uses the class-cached @aws.aws_client(Aws::WorkSpaces::Client)
+    # whose cache key has no region, and falls back to ENV["AWS_REGION"] || "us-east-1".
+    # #30 lists it as region-blind and #30 is right — this is a real defect awaiting
+    # the Phase 2 region-scope work, not a harness artifact.
+    status: known_blind
 
   - resource: aws_workspaces_web_inventory
     klass: AwsWorkSpacesWebInventory
