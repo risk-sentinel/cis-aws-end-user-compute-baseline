@@ -16,6 +16,7 @@
 # Depends on `_aws_backend_bootstrap.rb` having loaded first.
 
 class AwsWorkSpacesWebInventory < AwsResourceBase
+  include RegionScope
   name "aws_workspaces_web_inventory"
   desc "WorkSpaces Web portals + User Access Logging coverage."
   example "
@@ -47,7 +48,7 @@ class AwsWorkSpacesWebInventory < AwsResourceBase
       @connection_error = "aws-sdk-workspacesweb not installed: #{e.message}. Use risksentinel/cinc-auditor extended image (your CI image-bake tracker) or attest separately."
       return
     end
-    @regions = region_override.empty? ? fetch_default_regions : region_override
+    @regions = region_scope_or_fail!(@aws, region_override)
     fetch_data
   end
 
@@ -61,13 +62,6 @@ class AwsWorkSpacesWebInventory < AwsResourceBase
 
   private
 
-  def fetch_default_regions
-    regions = []
-    catch_aws_errors do
-      regions = @aws.compute_client.describe_regions.regions.map(&:region_name)
-    end
-    regions
-  end
 
   def fetch_data
     @regions.each do |region|

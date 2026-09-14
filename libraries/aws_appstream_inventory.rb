@@ -27,6 +27,7 @@
 # Depends on `_aws_backend_bootstrap.rb` having loaded first.
 
 class AwsAppStreamInventory < AwsResourceBase
+  include RegionScope
   name "aws_appstream_inventory"
   desc "AWS AppStream 2.0 fleets + image-builders + VPC-endpoint coverage."
   example "
@@ -78,7 +79,7 @@ class AwsAppStreamInventory < AwsResourceBase
       @connection_error = "aws-sdk-appstream not installed: #{e.message}. Use risksentinel/cinc-auditor extended image (your CI image-bake tracker) or attest separately."
       return
     end
-    @regions = region_override.empty? ? fetch_default_regions : region_override
+    @regions = region_scope_or_fail!(@aws, region_override)
     fetch_data
   end
 
@@ -100,13 +101,6 @@ class AwsAppStreamInventory < AwsResourceBase
 
   private
 
-  def fetch_default_regions
-    regions = []
-    catch_aws_errors do
-      regions = @aws.compute_client.describe_regions.regions.map(&:region_name)
-    end
-    regions
-  end
 
   def fetch_data
     @regions.each do |region|
