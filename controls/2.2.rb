@@ -118,10 +118,10 @@ control 'C-2.2' do
   "
   tag severity:              'medium'
   tag severity_source:       'unassessed'
-  tag nist:                  ['IA-2 (2)', 'SI-2 a']
-  tag ksi:                   ['KSI-CMT-VTD', 'KSI-IAM-APM']
-  tag nist_r4:               ['IA-2 (2)', 'SI-2 a']
-  tag cci:                   ['CCI-000766', 'CCI-001225']
+  tag nist:                  ['IA-2 (2)', 'IA-2 (1)']
+  tag ksi:                   ['KSI-IAM-APM']
+  tag nist_r4:               ['IA-2 (1)', 'IA-2 (2)']
+  tag cci:                   ['CCI-000766', 'CCI-000765']
   tag cis_number:            '2.2'
   tag cis_rid:               '2.2'
   tag cis_benchmark:         'CIS AWS End User Compute Services Benchmark v1.2.0'

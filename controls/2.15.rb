@@ -66,10 +66,10 @@ control 'C-2.15' do
   "
   tag severity:              'medium'
   tag severity_source:       'unassessed'
-  tag nist:                  ['AC-3', 'SC-7 a', 'PM-5', 'AC-8 a']
-  tag ksi:                   ['KSI-CNA-ULN', 'KSI-IAM-APM', 'KSI-IAM-ELP', 'KSI-IAM-JIT', 'KSI-SVC-EIS']
-  tag nist_r4:               ['AC-3', 'PM-5', 'SC-7 a']
-  tag cci:                   ['CCI-000213', 'CCI-001097', 'CCI-000207', 'CCI-000051']
+  tag nist:                  ['AC-3', 'AC-6', 'AC-3 (11)', 'SC-7 (12)', 'SC-7 (5)', 'SC-7 a']
+  tag ksi:                   ['KSI-CNA-MAT', 'KSI-CNA-RNT', 'KSI-CNA-ULN', 'KSI-IAM-APM', 'KSI-IAM-ELP', 'KSI-IAM-JIT', 'KSI-SVC-EIS']
+  tag nist_r4:               ['AC-3', 'AC-6', 'SC-7 (12)', 'SC-7 (5)', 'SC-7 a']
+  tag cci:                   ['CCI-000213', 'CCI-000225', 'CCI-003644', 'CCI-002406', 'CCI-001109', 'CCI-001097']
   tag cis_number:            '2.15'
   tag cis_rid:               '2.15'
   tag cis_benchmark:         'CIS AWS End User Compute Services Benchmark v1.2.0'
