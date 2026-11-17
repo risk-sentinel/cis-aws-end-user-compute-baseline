@@ -109,10 +109,10 @@ control 'C-2.12' do
   "
   tag severity:              'medium'
   tag severity_source:       'unassessed'
-  tag nist:                  ['CM-11 a', 'CM-7 a']
-  tag ksi:                   ['KSI-CMT-RMV', 'KSI-IAM-JIT']
-  tag nist_r4:               ['CM-11 a', 'CM-7 a']
-  tag cci:                   ['CCI-001805', 'CCI-000381']
+  tag nist:                  ['CM-8 (3) (b)', 'CM-8 (3) (a)', 'CM-11 c']
+  tag ksi:                   ['KSI-CMT-LMC', 'KSI-SVC-VRI']
+  tag nist_r4:               ['CM-11 c', 'CM-8 (3) (a)', 'CM-8 (3) (b)']
+  tag cci:                   ['CCI-001784', 'CCI-000416', 'CCI-001809']
   tag cis_number:            '2.12'
   tag cis_rid:               '2.12'
   tag cis_benchmark:         'CIS AWS End User Compute Services Benchmark v1.2.0'

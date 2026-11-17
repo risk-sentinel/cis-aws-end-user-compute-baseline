@@ -44,10 +44,10 @@ control 'C-4.4' do
   "
   tag severity:              'medium'
   tag severity_source:       'unassessed'
-  tag nist:                  ['AC-2 f', 'AU-2 a']
-  tag ksi:                   ['KSI-CMT-LMC', 'KSI-IAM-APM', 'KSI-IAM-JIT', 'KSI-IAM-SNU', 'KSI-IAM-SUS', 'KSI-MLA-LET', 'KSI-MLA-OSM', 'KSI-MLA-RVL']
-  tag nist_r4:               ['AC-2 f', 'AU-2 a']
-  tag cci:                   ['CCI-000011', 'CCI-000123']
+  tag nist:                  ['AU-12 c', 'AU-12 a', 'AU-2 a']
+  tag ksi:                   ['KSI-CMT-LMC', 'KSI-MLA-LET', 'KSI-MLA-OSM', 'KSI-MLA-RVL']
+  tag nist_r4:               ['AU-12 a', 'AU-12 c', 'AU-2 a']
+  tag cci:                   ['CCI-000172', 'CCI-000169', 'CCI-000123']
   tag cis_number:            '4.4'
   tag cis_rid:               '4.4'
   tag cis_benchmark:         'CIS AWS End User Compute Services Benchmark v1.2.0'

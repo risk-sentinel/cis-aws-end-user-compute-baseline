@@ -72,10 +72,10 @@ control 'C-4.1' do
   "
   tag severity:              'medium'
   tag severity_source:       'unassessed'
-  tag nist:                  ['CM-6 a', 'AC-11 b', 'AC-2 a', 'AC-2 c']
-  tag ksi:                   ['KSI-CMT-LMC', 'KSI-CMT-RMV', 'KSI-IAM-APM', 'KSI-IAM-JIT', 'KSI-IAM-SNU', 'KSI-IAM-SUS', 'KSI-MLA-EVC', 'KSI-SVC-ACM']
-  tag nist_r4:               ['AC-11 b', 'AC-2 a', 'AC-2 c', 'CM-6 a']
-  tag cci:                   ['CCI-000364', 'CCI-000056', 'CCI-002110', 'CCI-002113']
+  tag nist:                  ['AC-2 j', 'AC-2 d 1', 'AC-2 a', 'AC-6 (2)', 'AC-6 (5)']
+  tag ksi:                   ['KSI-IAM-APM', 'KSI-IAM-JIT', 'KSI-IAM-SNU', 'KSI-IAM-SUS']
+  tag nist_r4:               ['AC-2 d', 'AC-2 j', 'AC-6 (2)', 'AC-6 (5)']
+  tag cci:                   ['CCI-000012', 'CCI-002115', 'CCI-003612', 'CCI-000039', 'CCI-002227']
   tag cis_number:            '4.1'
   tag cis_rid:               '4.1'
   tag cis_benchmark:         'CIS AWS End User Compute Services Benchmark v1.2.0'
